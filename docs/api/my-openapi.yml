@@ -1,0 +1,54 @@
+openapi: 3.0.0
+info:
+  title: API設計書
+  version: 1.0.0
+  description: バックエンドエンジニア用研修課題
+
+tags:
+  - name: Comment
+    description: 
+
+servers:
+  - url: 'http://localhost/api'
+
+paths:
+  # --- コメント登録・コメント一覧 ---
+  '/article/{id}/comments':
+    parameters:
+      - name: id
+        in: path
+        description: 記事のID
+        required: true
+        schema:
+          type: integer
+    post: 
+      tags:
+        - Comment
+      summary: コメント登録
+      description: 記事にコメントを投稿する
+      operationId: storeComment
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:$ref: '#/components/schemas/CommentInput'
+      responses:
+        '201':
+          description: 登録成功
+        '400':
+          description: バリデーションエラー
+    get:
+      tags:
+        - Comment
+      summary: コメント一覧
+      description: 投稿されたコメントを一覧表示する
+      operationId: indexComments
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
