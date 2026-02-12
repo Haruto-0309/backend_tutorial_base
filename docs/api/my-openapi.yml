@@ -6,7 +6,7 @@ info:
 
 tags:
   - name: Comment
-    description: 
+    description: コメントに関する操作
 
 servers:
   - url: 'http://localhost/api'
@@ -31,7 +31,8 @@ paths:
         required: true
         content:
           application/json:
-            schema:$ref: '#/components/schemas/CommentInput'
+            schema:
+              $ref: '#/components/schemas/CommentInput'
       responses:
         '201':
           description: 登録成功
@@ -52,3 +53,36 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Comment'
+
+components: 
+  schemas: 
+    # 共通のデータ構造：入力用
+    CommentInput:
+      type: object
+      properties: 
+        content:
+          type: string
+          description: コメントの本文
+      required: 
+        -  content
+    
+    # 共通のデータ構造：表示用
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: コメントID
+          example: 101
+        article_id:
+          type: integer
+          description: 記事ID
+          example: 1
+        content:
+          type: string
+          description: コメントの本文
+          example: "この記事はとても参考になりました！"
+        created_at:
+          type: string
+          format: date-time
+          description: 投稿日時
