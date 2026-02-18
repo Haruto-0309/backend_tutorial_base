@@ -57,6 +57,53 @@ paths:
                   $ref: '#/components/schemas/Comment'
         '404':
           description: 指定された記事が見つかりません
+  
+  '/article/{id}/comments/{comments_id}':
+    parameters:
+      - name: id
+        in: path
+        description: 記事のID
+        required: true
+        schema:
+          type: integer
+
+      - name: comments_id
+        in: path
+        description: コメントのID
+        required: true
+        schema:
+          type: integer
+    
+    delete:
+      tags:
+        - Comment
+      summary: コメント削除
+      description: 投稿されたコメントの削除
+      operationId: deleteComments
+      responses:
+        '201':
+          description: 削除成功
+        '400':
+          description: エラー
+    put:
+      tags:
+        - Comment
+      summary: コメント更新
+      description: 投稿されたコメントの更新
+      operationId: updateComment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentInput'
+      responses:
+        '200':
+          description: 更新成功
+        '403':
+          description: 権限エラー（本人のみ更新可能）
+        '404':
+          description: コメントが見つかりません
 
 components: 
   schemas: 
@@ -76,17 +123,17 @@ components:
       properties:
         id:
           type: integer
-          description: コメントID
-          example: 101
-        article_id:
-          type: integer
-          description: 記事ID
           example: 1
-        content:
+        body:
           type: string
-          description: コメントの本文
-          example: "この記事はとても参考になりました！"
+          description: コメント本文
+          example: "この記事のリスク評価は非常に参考になります。"
+        comments_id:
+          type: integer
+          example: 5
         created_at:
           type: string
           format: date-time
-          description: 投稿日時
+        updated_at:
+          type: string
+          format: date-time
