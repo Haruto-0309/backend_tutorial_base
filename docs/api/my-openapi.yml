@@ -15,9 +15,9 @@ servers:
 
 paths:
   # --- コメント登録・コメント一覧 ---
-  '/article/{id}/comments':
+  '/articles/{article_id}/comments':
     parameters:
-      - name: id
+      - name: article_id
         in: path
         description: 記事のID
         required: true
@@ -58,16 +58,16 @@ paths:
         '404':
           description: 指定された記事が見つかりません
   
-  '/article/{id}/comments/{comments_id}':
+  '/articles/{article_id}/comments/{comment_id}':
     parameters:
-      - name: id
+      - name: article_id
         in: path
         description: 記事のID
         required: true
         schema:
           type: integer
 
-      - name: comments_id
+      - name: comment_id
         in: path
         description: コメントのID
         required: true
@@ -119,14 +119,16 @@ components:
     Comment:
       type: object
       properties:
-        id:
+        article_id:
           type: integer
           example: 1
         body:
           type: string
           description: コメント本文
+          minLength: 10
+          maxLength: 100
           example: "この記事のリスク評価は非常に参考になります。"
-        comments_id:
+        comment_id:
           type: integer
           example: 5
         created_at:
