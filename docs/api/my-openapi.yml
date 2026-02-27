@@ -109,31 +109,40 @@ components:
     CommentInput:
       type: object
       properties: 
+        username:
+          type: string
+          description: ユーザーネーム
+          example: "Bob"
         content:
           type: string
           description: コメントの本文
       required: 
-        -  content
+        - username
+        - content
     
     # 共通のデータ構造：表示用
     Comment:
       type: object
       properties:
-        article_id:
+        comment_id:
           type: integer
           example: 1
+          description: コメントの固有ID
+        article_id:
+          type: integer
+          example: 5
+          description: コメントが紐づく記事のID
         body:
           type: string
           description: コメント本文
           minLength: 10
           maxLength: 100
           example: "この記事のリスク評価は非常に参考になります。"
-        comment_id:
-          type: integer
-          example: 5
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
+      required: 
+        -  body
