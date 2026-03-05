@@ -27,3 +27,4 @@ sail
 *.Identifier
 memo.md
 /.agents/
+/.obsidian/
