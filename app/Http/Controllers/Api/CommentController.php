@@ -52,7 +52,7 @@ class CommentController extends Controller
         $comment = Comment::findOrFail($comment_id);
 
         $validated = $request->validate([
-            'content' => 'required|string',
+            'content' => 'required|string|min:10|max:100',
         ]);
 
         // 更新
