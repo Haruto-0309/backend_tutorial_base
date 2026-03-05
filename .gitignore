@@ -23,4 +23,7 @@ yarn-error.log
 /.zed
 sail
 
+# 自分で追加
 *.Identifier
+memo.md
+/.agents/
