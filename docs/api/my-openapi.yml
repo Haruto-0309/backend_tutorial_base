@@ -7,6 +7,8 @@ info:
 tags:
   - name: Comment
     description: コメントに関する操作
+  - name: User
+    description: ユーザーに関する操作
 
 security: []
 
@@ -14,6 +16,51 @@ servers:
   - url: http://localhost/api
 
 paths:
+  # --- ユーザー登録・ユーザー一覧 ---
+  '/users':
+    post: 
+      tags:
+        - User
+      summary: ユーザー登録
+      description: 新しいユーザーを登録する
+      operationId: storeUser
+      requestBody: 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "ユーザー登録に成功しました"
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: バリデーションエラー
+    get:
+      tags:
+        - User
+      summary: ユーザー一覧
+      description: 登録されたユーザーを一覧表示する
+      operationId: indexUsers
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
   # --- コメント登録・コメント一覧 ---
   '/articles/{article_id}/comments':
     parameters:
@@ -109,15 +156,15 @@ components:
     CommentInput:
       type: object
       properties: 
-        username:
-          type: string
-          description: ユーザーネーム
-          example: "Bob"
+        user_id:
+          type: integer
+          description: ユーザーID
+          example: 1
         content:
           type: string
           description: コメントの本文
       required: 
-        - username
+        - user_id
         - content
     
     # 共通のデータ構造：表示用
@@ -132,6 +179,10 @@ components:
           type: integer
           example: 5
           description: コメントが紐づく記事のID
+        user_id:
+          type: integer
+          example: 1
+          description: コメントを投稿したユーザーのID
         body:
           type: string
           description: コメント本文
@@ -145,4 +196,35 @@ components:
           type: string
           format: date-time
       required: 
-        -  body
+        - body
+
+    # 共通のデータ構造：ユーザー入力用
+    UserInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: ユーザー名
+          example: "Test User"
+      required:
+        - name
+        
+    # 共通のデータ構造：ユーザー表示用
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Test User"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name

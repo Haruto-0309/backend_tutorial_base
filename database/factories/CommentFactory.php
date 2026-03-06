@@ -17,7 +17,7 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'username' => fake()->userName(),
+            'user_id' => \App\Models\User::factory(),
             'body' => fake()->realTextBetween(10, 100),
             'article_id' => \App\Models\Article::factory(),
         ];
