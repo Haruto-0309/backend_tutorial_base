@@ -10,8 +10,13 @@ class Comment extends Model
     use HasFactory;
     //  保存を許可するカラムの指定
     protected $fillable = [
-        "username",
+        "user_id",
         "body",
         "article_id"
-        ];
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

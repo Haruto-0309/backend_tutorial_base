@@ -2,7 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CommentController;
+
+// ユーザー登録
+Route::post('/users', [UserController::class, 'store']);
+
+// ユーザー一覧取得
+Route::get('/users', [UserController::class, 'index']);
 
 // コメント登録
 Route::post('/articles/{article_id}/comments', [CommentController::class, 'store']);

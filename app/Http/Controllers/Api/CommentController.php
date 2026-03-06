@@ -17,14 +17,14 @@ class CommentController extends Controller
     {
         // 設計書の CommentInput (content必須) に基づくバリデーション
         $validated = $request->validate([
-            'username' => 'required|string',
+            'user_id' => 'required|exists:users,id',
             'content' => 'required|string|min:10|max:100'
         ]);
 
         // DBに保存
         Comment::create([
             'article_id' => $article_id,
-            'username'   => $validated['username'],
+            'user_id'    => $validated['user_id'],
             'body'       => $validated['content'], // 入力名はcontent、DBはbody
         ]);
 
