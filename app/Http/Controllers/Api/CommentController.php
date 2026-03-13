@@ -4,26 +4,30 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Comment; // 追加：モデルを使う
-use App\Http\Resources\CommentResource; // 追加：変換器を使う
+use App\Models\Article;
+use App\Models\Comment;
+use App\Http\Resources\CommentResource;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
 
 class CommentController extends Controller
 {
     /**
      * コメント登録 (storeComment)
-     * POST /articles/{article_id}/comments
+     * POST /articles/{article}/comments
+     * 
+     * @param StoreCommentRequest $request
+     * @param Article $article
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, $article_id)
+    public function store(StoreCommentRequest $request, Article $article)
     {
-        // 設計書の CommentInput (content必須) に基づくバリデーション
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'content' => 'required|string|min:10|max:100'
-        ]);
+        // FormRequestによるバリデーション済みデータを取得
+        $validated = $request->validated();
 
         // DBに保存
         Comment::create([
-            'article_id' => $article_id,
+            'article_id' => $article->id,
             'user_id'    => $validated['user_id'],
             'body'       => $validated['content'], // 入力名はcontent、DBはbody
         ]);
@@ -33,27 +37,30 @@ class CommentController extends Controller
 
     /**
      * コメント一覧 (indexComments)
-     * GET /articles/{article_id}/comments
+     * GET /articles/{article}/comments
+     * 
+     * @param Article $article
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Http\JsonResponse
      */
-    public function index($article_id)
+    public function index(Article $article)
     {
-        $comments = Comment::where('article_id', $article_id)->get();
+        $comments = $article->comments;
 
         // Resourceを使って、設計書通りに変換して返す
         return CommentResource::collection($comments);
     }
 
     /**
-     * 更新: PUT /articles/{article_id}/comments/{comment_id}
+     * 更新: PUT /articles/{article}/comments/{comment}
+     * 
+     * @param UpdateCommentRequest $request
+     * @param Article $article
+     * @param Comment $comment
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $article_id, $comment_id)
+    public function update(UpdateCommentRequest $request, Article $article, Comment $comment)
     {
-        // 該当するコメントを検索（なければ404エラーを自動で出す）
-        $comment = Comment::findOrFail($comment_id);
-
-        $validated = $request->validate([
-            'content' => 'required|string|min:10|max:100',
-        ]);
+        $validated = $request->validated();
 
         // 更新
         $comment->update(['body' => $validated['content']]);
@@ -62,11 +69,14 @@ class CommentController extends Controller
     }
 
     /**
-     * 削除: DELETE /articles/{article_id}/comments/{comment_id}
+     * 削除: DELETE /articles/{article}/comments/{comment}
+     * 
+     * @param Article $article
+     * @param Comment $comment
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($article_id, $comment_id)
+    public function destroy(Article $article, Comment $comment)
     {
-        $comment = Comment::findOrFail($comment_id);
         $comment->delete();
 
         return response()->json(['message' => '削除成功'], 200);
