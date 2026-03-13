@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateCommentRequest extends FormRequest
+class DestroyCommentRequest extends FormRequest
 {
     /**
      * リクエストの認可判定
@@ -25,7 +25,6 @@ class UpdateCommentRequest extends FormRequest
     {
         return [
             'user_id' => 'required|integer',
-            'content' => 'required|string|min:10|max:100',
         ];
     }
 

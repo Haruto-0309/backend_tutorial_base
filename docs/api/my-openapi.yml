@@ -129,11 +129,28 @@ paths:
       summary: コメント削除
       description: 投稿されたコメントの削除
       operationId: deleteComments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: ユーザーID
+                  example: 1
+              required:
+                - user_id
       responses:
         '200':
           description: 削除成功
+        '403':
+          description: 他人のコメントは操作できません
         '404':
           description: 指定されたコメントが見つかりません
+        '422':
+          description: バリデーションエラー
     put:
       tags:
         - Comment
@@ -149,6 +166,8 @@ paths:
       responses:
         '200':
           description: 更新成功
+        '403':
+          description: 他人のコメントは操作できません
         '404':
           description: コメントが見つかりません
         '422':

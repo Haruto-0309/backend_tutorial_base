@@ -9,6 +9,7 @@ use App\Models\Comment;
 use App\Http\Resources\CommentResource;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
+use App\Http\Requests\DestroyCommentRequest;
 
 class CommentController extends Controller
 {
@@ -62,6 +63,10 @@ class CommentController extends Controller
     {
         $validated = $request->validated();
 
+        if ($comment->user_id !== $validated['user_id']) {
+            return response()->json(['message' => '他人のコメントは操作できません'], 403);
+        }
+
         // 更新
         $comment->update(['body' => $validated['content']]);
 
@@ -71,12 +76,18 @@ class CommentController extends Controller
     /**
      * 削除: DELETE /articles/{article}/comments/{comment}
      * 
+     * @param DestroyCommentRequest $request
      * @param Article $article
      * @param Comment $comment
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Article $article, Comment $comment)
+    public function destroy(DestroyCommentRequest $request, Article $article, Comment $comment)
     {
+        $validated = $request->validated();
+
+        if ($comment->user_id !== $validated['user_id']) {
+            return response()->json(['message' => '他人のコメントは操作できません'], 403);
+        }
         $comment->delete();
 
         return response()->json(['message' => '削除成功'], 200);
