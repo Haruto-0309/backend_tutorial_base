@@ -12,13 +12,13 @@ Route::post('/users', [UserController::class, 'store']);
 Route::get('/users', [UserController::class, 'index']);
 
 // コメント登録
-Route::post('/articles/{article_id}/comments', [CommentController::class, 'store']);
+Route::post('/articles/{article}/comments', [CommentController::class, 'store']);
 
 // コメント一覧取得
-Route::get('/articles/{article_id}/comments', [CommentController::class, 'index']);
+Route::get('/articles/{article}/comments', [CommentController::class, 'index']);
 
 // コメント削除
-Route::delete('/articles/{article_id}/comments/{comment_id}', [CommentController::class, 'destroy']);
+Route::delete('/articles/{article}/comments/{comment}', [CommentController::class, 'destroy'])->scopeBindings();
 
 // コメント更新
-Route::put('/articles/{article_id}/comments/{comment_id}', [CommentController::class, 'update']);
+Route::put('/articles/{article}/comments/{comment}', [CommentController::class, 'update'])->scopeBindings();

@@ -43,7 +43,7 @@ paths:
                     example: "ユーザー登録に成功しました"
                   user:
                     $ref: '#/components/schemas/User'
-        '400':
+        '422':
           description: バリデーションエラー
     get:
       tags:
@@ -85,7 +85,9 @@ paths:
       responses:
         '200':
           description: 登録成功
-        '400':
+        '404':
+          description: 指定された記事が見つかりません
+        '422':
           description: バリデーションエラー
     get:
       tags:
@@ -130,8 +132,8 @@ paths:
       responses:
         '200':
           description: 削除成功
-        '400':
-          description: エラー
+        '404':
+          description: 指定されたコメントが見つかりません
     put:
       tags:
         - Comment
@@ -149,6 +151,8 @@ paths:
           description: 更新成功
         '404':
           description: コメントが見つかりません
+        '422':
+          description: バリデーションエラー
 
 components: 
   schemas: 

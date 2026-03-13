@@ -5,14 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
 
 class UserController extends Controller
 {
-    public function store(Request $request)
+    /**
+     * ユーザー登録
+     * 
+     * @param StoreUserRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create($validated);
 
@@ -22,6 +27,11 @@ class UserController extends Controller
         ], 201);
     }
 
+    /**
+     * ユーザー一覧取得
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         return response()->json(User::all());
