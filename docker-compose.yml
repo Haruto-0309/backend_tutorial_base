@@ -74,7 +74,17 @@ services:
         networks:
             - sail
     ## ReDoc
-    # IMPLEMENT HERE
+    ## ReDoc
+    redoc:
+        image: redocly/redoc
+        ports:
+            - '8003:80'
+        environment:
+            SPEC_URL: 'openapi.yml'
+        volumes:
+            - './docs/api/${OPENAPI_FILE_NAME}:/usr/share/nginx/html/openapi.yml'
+        networks:
+            - sail
 
 networks:
     sail:
