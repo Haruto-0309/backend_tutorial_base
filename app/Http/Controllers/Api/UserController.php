@@ -19,11 +19,30 @@ class UserController extends Controller
     {
         $validated = $request->validated();
 
-        $user = User::create($validated);
+        $emailVerification = \App\Models\EmailVerification::where('email', $validated['email'])
+            ->where('token', $validated['token'])
+            ->first();
+
+        if (!$emailVerification || $emailVerification->expires_at->isPast()) {
+            return response()->json([
+                'message' => '無効な認証コード、または有効期限が切れています。',
+            ], 422);
+        }
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
+
+        $emailVerification->delete();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'ユーザー登録に成功しました',
-            'user' => $user
+            'user' => $user,
+            'access_token' => $token
         ], 201);
     }
 

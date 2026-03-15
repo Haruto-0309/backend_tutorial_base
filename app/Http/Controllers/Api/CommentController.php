@@ -29,7 +29,7 @@ class CommentController extends Controller
         // DBに保存
         Comment::create([
             'article_id' => $article->id,
-            'user_id'    => $validated['user_id'],
+            'user_id'    => $request->user()->id,
             'body'       => $validated['content'], // 入力名はcontent、DBはbody
         ]);
 
@@ -63,7 +63,7 @@ class CommentController extends Controller
     {
         $validated = $request->validated();
 
-        if ($comment->user_id !== $validated['user_id']) {
+        if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => '他人のコメントは操作できません'], 403);
         }
 
@@ -85,7 +85,7 @@ class CommentController extends Controller
     {
         $validated = $request->validated();
 
-        if ($comment->user_id !== $validated['user_id']) {
+        if ($comment->user_id !== $request->user()->id) {
             return response()->json(['message' => '他人のコメントは操作できません'], 403);
         }
         $comment->delete();

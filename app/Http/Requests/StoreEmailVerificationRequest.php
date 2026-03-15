@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DestroyCommentRequest extends FormRequest
+class StoreEmailVerificationRequest extends FormRequest
 {
     /**
      * リクエストの認可判定
@@ -23,7 +23,9 @@ class DestroyCommentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'email' => 'required|email|max:255|unique:users,email',
+        ];
     }
 
     /**
