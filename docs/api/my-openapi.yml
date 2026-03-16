@@ -5,6 +5,8 @@ info:
   description: バックエンドエンジニア用研修課題
 
 tags:
+  - name: Auth
+    description: 認証に関する操作
   - name: Comment
     description: コメントに関する操作
   - name: User
@@ -16,13 +18,90 @@ servers:
   - url: http://localhost/api
 
 paths:
+  # --- 認証 ---
+  '/register/pre':
+    post:
+      tags:
+        - Auth
+      summary: 仮登録（メールアドレス送信）
+      description: 入力されたメールアドレス宛に6桁の認証コードを送信する
+      operationId: preRegister
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: 登録するメールアドレス
+                  example: "test@example.com"
+              required:
+                - email
+      responses:
+        '200':
+          description: メール送信成功
+        '422':
+          description: バリデーションエラー
+
+  '/login':
+    post:
+      tags:
+        - Auth
+      summary: ログイン
+      description: ユーザーのメールアドレスとパスワードでログインする
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: ユーザーのメールアドレス
+                  example: "test@example.com"
+                password:
+                  type: string
+                  description: パスワード
+                  example: "password123"
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: ログイン成功
+        '401':
+          description: 認証失敗（メールアドレスまたはパスワードが間違っている等）
+        '422':
+          description: バリデーションエラー
+
+  '/logout':
+    post:
+      tags:
+        - Auth
+      summary: ログアウト
+      description: 現在のAPIトークンを無効化してログアウトする
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ログアウト成功
+        '401':
+          description: 未認証（ログインしていない）
+
   # --- ユーザー登録・ユーザー一覧 ---
   '/users':
     post: 
       tags:
         - User
-      summary: ユーザー登録
-      description: 新しいユーザーを登録する
+      summary: ユーザー登録 (本登録)
+      description: メールに届いたトークンを用いて新しいユーザーを登録する
       operationId: storeUser
       requestBody: 
         required: true
@@ -74,8 +153,10 @@ paths:
       tags:
         - Comment
       summary: コメント登録
-      description: 記事にコメントを投稿する
+      description: 記事にコメントを投稿する。投稿者はログイン中のユーザーになる。
       operationId: storeComment
+      security:
+        - bearerAuth: []
       requestBody: 
         required: true
         content:
@@ -83,8 +164,10 @@ paths:
             schema:
               $ref: '#/components/schemas/CommentInput'
       responses:
-        '200':
+        '201':
           description: 登録成功
+        '401':
+          description: 未認証
         '404':
           description: 指定された記事が見つかりません
         '422':
@@ -127,36 +210,27 @@ paths:
       tags:
         - Comment
       summary: コメント削除
-      description: 投稿されたコメントの削除
+      description: 投稿されたコメントの削除。自分自身のコメントのみ削除可能。
       operationId: deleteComments
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  type: integer
-                  description: ユーザーID
-                  example: 1
-              required:
-                - user_id
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: 削除成功
+        '401':
+          description: 未認証
         '403':
           description: 他人のコメントは操作できません
         '404':
           description: 指定されたコメントが見つかりません
-        '422':
-          description: バリデーションエラー
     put:
       tags:
         - Comment
       summary: コメント更新
-      description: 投稿されたコメントの更新
+      description: 投稿されたコメントの更新。自分自身のコメントのみ更新可能。
       operationId: updateComment
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -166,6 +240,8 @@ paths:
       responses:
         '200':
           description: 更新成功
+        '401':
+          description: 未認証
         '403':
           description: 他人のコメントは操作できません
         '404':
@@ -174,20 +250,22 @@ paths:
           description: バリデーションエラー
 
 components: 
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: ログイン時に取得した `access_token` を入力してください。
+
   schemas: 
     # 共通のデータ構造：入力用
     CommentInput:
       type: object
       properties: 
-        user_id:
-          type: integer
-          description: ユーザーID
-          example: 1
         content:
           type: string
           description: コメントの本文
+          example: "この記事の内容は大変すばらしいです。"
       required: 
-        - user_id
         - content
     
     # 共通のデータ構造：表示用
@@ -209,8 +287,6 @@ components:
         body:
           type: string
           description: コメント本文
-          minLength: 10
-          maxLength: 100
           example: "この記事のリスク評価は非常に参考になります。"
         created_at:
           type: string
@@ -229,8 +305,24 @@ components:
           type: string
           description: ユーザー名
           example: "Test User"
+        email:
+          type: string
+          format: email
+          description: 登録するメールアドレス
+          example: "test@example.com"
+        password:
+          type: string
+          description: パスワード（8文字以上）
+          example: "password123"
+        token:
+          type: string
+          description: 仮登録時にメール送信された6桁のトークン
+          example: "123456"
       required:
         - name
+        - email
+        - password
+        - token
         
     # 共通のデータ構造：ユーザー表示用
     User:

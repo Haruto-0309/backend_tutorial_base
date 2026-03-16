@@ -14,7 +14,7 @@ Route::post('/register/pre', [EmailVerificationController::class, 'store']);
 Route::post('/users', [UserController::class, 'store']);
 
 // ログイン
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 // ユーザー一覧取得
 Route::get('/users', [UserController::class, 'index']);
