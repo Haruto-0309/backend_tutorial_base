@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('email_verifications', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->index();
+            $table->string('email')->unique();
             $table->string('token');
             $table->timestamp('expires_at');
             $table->timestamps();
